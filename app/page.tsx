@@ -5,7 +5,7 @@ import { FormEvent } from 'react'
 export default function Home() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    window.alert('Заявку підготовлено. Канал прийому заявок ще не підключений.')
+    window.alert('Дякуємо. Заявка підготовлена. Додайте реальний канал прийому заявок перед запуском реклами.')
   }
 
   return (
@@ -43,7 +43,7 @@ export default function Home() {
 
       <section id="order" className="order">
         <h2>Замовити прибирання</h2>
-        <p>Залиште дані. Канал прийому заявок буде підключений після додавання реальних контактних реквізитів.</p>
+        <p>Залиште дані для попередньої заявки. Реальний канал прийому заявок потрібно підключити перед запуском рекламного трафіку.</p>
         <form onSubmit={handleSubmit}>
           <input aria-label="Ваше ім'я" placeholder="Ваше імʼя" required />
           <input aria-label="Телефон" placeholder="Телефон" type="tel" required />
