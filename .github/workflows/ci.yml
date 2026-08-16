@@ -7,18 +7,56 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
+    name: Validate repository
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate repository
+      - name: Validate required files
         shell: bash
         run: |
           set -euo pipefail
-          test -f README.md
           test -s README.md
-          find . -type f -not -path './.git/*' -print0 | xargs -0 -r -n1 bash -c 'test -s "$0"'
-          echo "Repository validation passed."
+          test -s CONTRIBUTING.md
+
+      - name: Validate repository files
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            test -s "$file"
+          done < <(find . -type f \
+            -not -path './.git/*' \
+            -not -path './.github/workflows/ci.yml' \
+            -print0)
+
+      - name: Check for accidentally committed private keys
+        shell: bash
+        run: |
+          set -euo pipefail
+          if find . -type f \
+            -not -path './.git/*' \
+            \( -name '*.pem' -o -name '*.key' -o -name '*.p12' -o -name '*.pfx' \) \
+            -print -quit | grep -q .; then
+            echo 'Potential private key material found in repository.'
+            exit 1
+          fi
+
+      - name: Validate Git configuration files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e .env
+          test ! -e .env.local
+          test ! -e .env.production
