@@ -1,4 +1,13 @@
+'use client'
+
+import { FormEvent } from 'react'
+
 export default function Home() {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    window.alert('Заявку підготовлено. Канал прийому заявок ще не підключений.')
+  }
+
   return (
     <main>
       <header>
@@ -34,8 +43,8 @@ export default function Home() {
 
       <section id="order" className="order">
         <h2>Замовити прибирання</h2>
-        <p>Залиште дані — після підключення робочого каналу зв’язку форма прийматиме заявки безпосередньо.</p>
-        <form onSubmit={(event) => event.preventDefault()}>
+        <p>Залиште дані. Канал прийому заявок буде підключений після додавання реальних контактних реквізитів.</p>
+        <form onSubmit={handleSubmit}>
           <input aria-label="Ваше ім'я" placeholder="Ваше імʼя" required />
           <input aria-label="Телефон" placeholder="Телефон" type="tel" required />
           <select aria-label="Послуга" defaultValue="" required>
