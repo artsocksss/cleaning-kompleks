@@ -7,18 +7,29 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  validate:
+  quality:
+    name: Typecheck and production build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate repository
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f README.md
-          test -s README.md
-          find . -type f -not -path './.git/*' -print0 | xargs -0 -r -n1 bash -c 'test -s "$0"'
-          echo "Repository validation passed."
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Production build
+        run: npm run build
