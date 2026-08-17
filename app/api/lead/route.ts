@@ -6,6 +6,11 @@ export async function POST(request: Request) {
     const name = String(body.name ?? '').trim()
     const phone = String(body.phone ?? '').trim()
     const service = String(body.service ?? '').trim()
+    const area = String(body.area ?? '').trim()
+    const date = String(body.date ?? '').trim()
+    const time = String(body.time ?? '').trim()
+    const note = String(body.note ?? '').trim()
+    const source = String(body.source ?? 'website').trim()
 
     if (!name || !phone || !service) {
       return NextResponse.json({ ok: false, error: 'Заповніть усі поля.' }, { status: 400 })
@@ -21,7 +26,12 @@ export async function POST(request: Request) {
         `Імʼя: ${name}`,
         `Телефон: ${phone}`,
         `Послуга: ${service}`,
-      ].join('\n')
+        area ? `Площа: ${area} м²` : '',
+        date ? `Дата: ${date}` : '',
+        time ? `Час: ${time}` : '',
+        note ? `Коментар: ${note}` : '',
+        `Джерело: ${source}`,
+      ].filter(Boolean).join('\n')
 
       const telegramResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
@@ -34,7 +44,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ ok: false, error: 'Не вдалося передати заявку адміністратору.' }, { status: 502 })
       }
     } else {
-      console.info('Cleaning Kompleks lead received; Telegram is not configured', { name, phone, service })
+      console.info('Cleaning Kompleks lead received; Telegram is not configured', { name, phone, service, area, date, time, note, source })
     }
 
     return NextResponse.json({ ok: true })
